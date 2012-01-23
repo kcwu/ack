@@ -117,6 +117,7 @@ BEGIN {
         sql         => [qw( sql ctl )],
         tcl         => [qw( tcl itcl itk )],
         tex         => [qw( tex cls sty )],
+        test        => q{Test files. Filename looks like test},
         text        => q{Text files, as defined by Perl's -T op (default: off)},
         tt          => [qw( tt tt2 ttml )],
         vb          => [qw( bas cls frm ctl vb resx )],
@@ -491,6 +492,7 @@ even under -a.
 =cut
 
 use constant TEXT => 'text';
+use constant TEST => 'test';
 
 sub filetypes {
     my $filename = shift;
@@ -507,7 +509,13 @@ sub filetypes {
     # If there's an extension, look it up
     if ( $filename =~ m{\.([^\.$dir_sep_chars]+)$}o ) {
         my $ref = $types{lc $1};
-        return (@{$ref},TEXT) if $ref;
+        if ($ref) {
+            my @types = (@{$ref}, TEXT);
+            if ( $basename =~ m{ ^[Tt]est | [_.-][Tt]est\. | [a-z]Test\. | \.t$ }xo) {
+                 push @types, TEST;
+            }
+            return @types;
+        }
     }
 
     # At this point, we can't tell from just the name.  Now we have to
