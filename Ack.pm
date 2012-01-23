@@ -513,6 +513,8 @@ sub filetypes {
     # At this point, we can't tell from just the name.  Now we have to
     # open it and look inside.
 
+    my @types_need_look = qw/binary shell xml ruby lua perl php python/;
+    return unless grep defined $type_wanted{$_}, @types_need_look, TEXT;
     return unless -e $filename;
     # From Elliot Shank:
     #     I can't see any reason that -r would fail on these-- the ACLs look
@@ -528,6 +530,7 @@ sub filetypes {
     }
 
     return 'binary' if -B $filename;
+    return (TEXT) unless grep defined $type_wanted{$_}, @types_need_look;
 
     # If there's no extension, or we don't recognize it, check the shebang line
     my $fh;
